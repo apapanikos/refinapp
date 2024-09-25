@@ -1,6 +1,7 @@
-import { sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import { pgTable, serial, text } from "drizzle-orm/pg-core";
 import { z } from "zod";
+import { userRoles } from "./userRoles";
 
 export type RoleType = (typeof allowedRoles)[number];
 
@@ -19,6 +20,10 @@ export const roles = pgTable("roles", {
     .unique()
     .default(sql`'basic_user'`),
 });
+
+export const rolesRelations = relations(roles, ({ many }) => ({
+  users: many(userRoles), // Each role can have many users through userRoles
+}));
 
 export type InsertRole = typeof roles.$inferInsert;
 export type SelectRole = typeof roles.$inferSelect;

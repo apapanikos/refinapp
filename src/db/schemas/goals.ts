@@ -1,6 +1,6 @@
 import { pgTable, serial, integer, text, numeric } from "drizzle-orm/pg-core";
 import { users } from "./users";
-import { sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export const goals = pgTable("goals", {
@@ -12,6 +12,13 @@ export const goals = pgTable("goals", {
   targetAmount: numeric("target_amount").notNull(),
   currentAmount: numeric("current_amount").default(sql`0`),
 });
+
+export const goalsRelations = relations(goals, ({ one }) => ({
+  user: one(users, {
+    fields: [goals.userId],
+    references: [users.id],
+  }), // Each goal belongs to a user
+}));
 
 export const goalSchema = z.object({
   userId: z.number().positive(),
