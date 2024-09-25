@@ -1,6 +1,8 @@
 import { db } from "@/db/drizzle";
-import { InsertUser, users } from "@/db/schemas/users";
+import { InsertUser, users, userSchema } from "@/db/schemas/users";
 
 export async function createUser(data: InsertUser) {
-  await db.insert(users).values(data);
+  // Validate the request body using Zod
+  const parsedData = userSchema.parse(data);
+  await db.insert(users).values(parsedData);
 }
