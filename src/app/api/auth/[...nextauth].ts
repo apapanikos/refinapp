@@ -9,13 +9,19 @@ export const authOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      authorization: {
+        url: "https://accounts.google.com/o/oauth2/v2/auth",
+        params: {
+          scope: "openid email profile",
+          access_type: "offline", // Required to get refresh tokens
+          prompt: "consent", // Forces the user to consent to providing refresh tokens
+        },
+      },
     }),
-
     AppleProvider({
       clientId: process.env.APPLE_CLIENT_ID as string,
       clientSecret: process.env.APPLE_CLIENT_SECRET as string,
     }),
-
     CredentialsProvider({
       name: "Credentials",
       credentials: {
@@ -34,6 +40,12 @@ export const authOptions = {
   ],
   // Customize session callback to include user ID in session
   callbacks: {
+    // async signIn({ account, profile }: { account: any; profile: any }) {
+    //   if (account.provider === "google") {
+    //     return profile.email_verified && profile.email.endsWith("@example.com");
+    //   }
+    //   return true; // Do different verification for other providers that don't have `email_verified`
+    // },
     async session({ session, token }: { session: any; token: any }) {
       session.user.id = token.sub;
       return session;
