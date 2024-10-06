@@ -1,11 +1,11 @@
-import { pgTable, serial, integer, text, numeric } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, numeric } from "drizzle-orm/pg-core";
 import { users } from "./users";
 import { relations, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export const goals = pgTable("goals", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id")
+  userId: text("user_id")
     .references(() => users.id)
     .notNull(),
   goalName: text("goal_name").notNull(),

@@ -1,10 +1,10 @@
-import { pgTable, integer } from "drizzle-orm/pg-core";
-import { users } from "@/db/schemas/users";
-import { roles } from "@/db/schemas/roles";
+import { pgTable, integer, text } from "drizzle-orm/pg-core";
+import { users } from "@/src/db/schemas/users";
+import { roles } from "@/src/db/schemas/roles";
 import { relations } from "drizzle-orm";
 
 export const userRoles = pgTable("user_roles", {
-  userId: integer("user_id")
+  userId: text("user_id")
     .references(() => users.id)
     .notNull(), // FK to users table
   roleId: integer("role_id")

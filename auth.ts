@@ -1,13 +1,15 @@
+// /* eslint-disable @typescript-eslint/no-explicit-any */
 import NextAuth from "next-auth";
 import { authConfig } from "./auth.config";
 import CredentialsProvider from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
-import { db } from "@/db/drizzle";
-import { users } from "@/db/schema";
+import { db } from "@/src/db/drizzle";
+import { accounts, users } from "@/src/db/schema";
 import { eq } from "drizzle-orm";
-import { verifyPassword } from "@/lib/auth/utils";
+import { verifyPassword } from "@/src/lib/auth/utils";
 import { ZodError } from "zod";
-import { signInSchema } from "@/lib/zod/auth";
+import { SignInSchema } from "@/src/lib/zod/auth";
+import { DrizzleAdapter } from "@auth/drizzle-adapter";
 
 async function getUser(email: string): Promise<any | undefined> {
   try {
@@ -20,7 +22,7 @@ async function getUser(email: string): Promise<any | undefined> {
     return userArr[0];
   } catch (error) {
     console.error("Failed to fetch user:", error);
-    throw new Error("Failed to fetch user.");
+    return;
   }
 }
 
@@ -30,6 +32,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     strategy: "jwt",
     maxAge: 2 * 24 * 60 * 60, // 2 days
   },
+  adapter: DrizzleAdapter(db, {
+    usersTable: users,
+    accountsTable: accounts,
+  }),
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
@@ -54,9 +60,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
       async authorize(credentials) {
         try {
-          const { email, password } = await signInSchema.parseAsync(
-            credentials
-          );
+          const validatedFields = await SignInSchema.safeParse(credentials);
+
+          if (!validatedFields.success) {
+            return null;
+          }
+
+          const { email, password } = validatedFields.data;
 
           const user = await getUser(email);
 
@@ -71,7 +81,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return user;
         } catch (error) {
           if (error instanceof ZodError) {
-            // Return `null` to indicate that the credentials are invalid
             return null;
           }
         }
