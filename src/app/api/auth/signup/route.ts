@@ -1,8 +1,8 @@
 // app/api/auth/signup/route.ts
 import { NextResponse } from "next/server";
-import { db } from "@/db/drizzle";
-import { users, InsertUser } from "@/db/schema";
-import { hashPassword } from "@/lib/auth/utils";
+import { db } from "@/src/db/drizzle";
+import { users, InsertUser } from "@/src/db/schema";
+import { hashPassword } from "@/src/lib/auth/utils";
 import { eq } from "drizzle-orm";
 
 // API route to handle user sign-up
@@ -43,7 +43,7 @@ export async function POST(req: Request) {
       .returning({ id: users.id });
 
     return NextResponse.json({ success: true, userId: insertedUser[0].id });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "An error occurred" }, { status: 500 });
   }
 }
