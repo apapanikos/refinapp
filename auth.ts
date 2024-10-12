@@ -12,7 +12,7 @@ import { SignInSchema } from "@/src/lib/zod/auth";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { User } from "@/src/lib/definitions";
 
-async function getUser(email: string): Promise<User | undefined> {
+async function getUser(email: string): Promise<User | null> {
   try {
     const userArr = await db
       .select()
@@ -20,10 +20,10 @@ async function getUser(email: string): Promise<User | undefined> {
       .where(eq(users.email, email))
       .limit(1);
 
-    return userArr[0] as User;
+    return userArr.length > 0 ? (userArr[0] as User) : null;
   } catch (error) {
     console.error("Failed to fetch user:", error);
-    return;
+    return null;
   }
 }
 
@@ -62,7 +62,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
       async authorize(credentials) {
         try {
-          const validatedFields = await SignInSchema.safeParse(credentials);
+          const validatedFields = SignInSchema.safeParse(credentials);
 
           if (!validatedFields.success) {
             return null;
@@ -78,13 +78,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           const passwordsMatch = await verifyPassword(password, user.password);
           if (!passwordsMatch) {
-            return;
+            return null;
           }
           return user;
         } catch (error) {
           if (error instanceof ZodError) {
             return null;
           }
+          return null;
         }
       },
     }),
