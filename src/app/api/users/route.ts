@@ -1,7 +1,7 @@
 // src/app/api/users/route.ts
 import { NextResponse } from "next/server";
-import { createUser } from "@/db/queries/users/insert";
-import { getAllUsers } from "@/db/queries/users/select";
+import { createUser } from "@/src/db/queries/users/insert";
+import { getAllUsers } from "@/src/db/queries/users/select";
 
 export async function POST(req: Request) {
   try {
