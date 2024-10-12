@@ -13,7 +13,7 @@ import { categories } from "./categories";
 
 export const transactions = pgTable("transactions", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id")
+  userId: text("user_id")
     .references(() => users.id)
     .notNull(),
   amount: numeric("amount").notNull(),
@@ -34,7 +34,7 @@ export const transactionsRelations = relations(transactions, ({ one }) => ({
 }));
 
 export const transactionSchema = z.object({
-  userId: z.number().positive(),
+  userId: z.string(),
   amount: z.number().positive(),
   type: z.enum(["income", "expense"]),
 });

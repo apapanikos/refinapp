@@ -1,5 +1,5 @@
-import { db } from "@/db/drizzle";
-import { InsertUser, users, userSchema } from "@/db/schemas/users";
+import { db } from "@/src/db/drizzle";
+import { InsertUser, users, userSchema } from "@/src/db/schemas/users";
 
 export async function createUser(data: InsertUser) {
   // Validate the request body using Zod
