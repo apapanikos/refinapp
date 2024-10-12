@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { signin } from "@/src/app/actions/auth";
+import { authenticateWithProvider, signin } from "@/src/app/actions/auth";
 import { Button } from "@/src/components/ui/button";
 import {
   Card,
@@ -11,10 +11,8 @@ import {
   CardTitle,
 } from "@/src/components/ui/card";
 import { Input } from "@/src/components/ui/input";
-// import { Label } from "@/src/components/ui/label";
 import { useState } from "react";
 import Link from "next/link";
-// import { signIn } from "../../../auth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SignInSchema } from "@/src/lib/zod/auth";
@@ -46,7 +44,7 @@ export const SignInForm = () => {
 
     startTransition(() => {
       signin(values).then((data) => {
-        setError(data.error);
+        setError(data.error as string);
         setSuccess(data.success);
       });
     });
@@ -106,18 +104,18 @@ export const SignInForm = () => {
                 </FormItem>
               )}
             />
-            <FormError message={error}></FormError>
-            <FormSuccess message={success}></FormSuccess>
+            <FormError message={error ?? ""}></FormError>
+            <FormSuccess message={success ?? ""}></FormSuccess>
             <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? "Logging in..." : "Login"}
+              {isPending ? "Signing in..." : "Sign In"}
             </Button>
-            {/* <Button
+            <Button
               variant="outline"
               className="w-full"
-              onClick={() => signIn("google")}
+              onClick={() => authenticateWithProvider("google")}
             >
-              Login with Google
-            </Button> */}
+              Sign In with Google
+            </Button>
           </form>
         </Form>
         <div className="mt-4 text-center text-sm">

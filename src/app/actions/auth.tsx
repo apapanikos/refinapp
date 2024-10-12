@@ -1,7 +1,7 @@
 "use server";
 
 import { SignupFormSchema } from "@/src/lib/definitions";
-import { signIn } from "../../../auth";
+import { signIn, signOut } from "@/auth";
 import { AuthError } from "next-auth";
 import { SignInSchema, SignUpSchema } from "@/src/lib/zod/auth";
 import * as z from "zod";
@@ -45,10 +45,13 @@ export async function signin(values: z.infer<typeof SignInSchema>) {
   try {
     await signIn("credentials", values);
   } catch (error) {
+    console.log(error);
     if (error instanceof AuthError) {
       switch (error.type) {
         case "CredentialsSignin":
           return { error: "Invalid credentials." };
+        case "OAuthAccountNotLinked":
+          return { error: "Account not linked." };
         default:
           return { error: "Something went wrong." };
       }
@@ -56,4 +59,12 @@ export async function signin(values: z.infer<typeof SignInSchema>) {
     throw error;
   }
   return { success: "Email sent!" };
+}
+
+export async function authenticateWithProvider(provider: string) {
+  await signIn(provider);
+}
+
+export async function signout() {
+  await signOut();
 }

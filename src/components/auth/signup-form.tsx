@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { signup } from "@/src/app/actions/auth";
+import { authenticateWithProvider, signup } from "@/src/app/actions/auth";
 import { Button } from "@/src/components/ui/button";
 import {
   Card,
@@ -116,18 +116,18 @@ export const SignUpForm = () => {
                 </FormItem>
               )}
             />
-            <FormError message={error}></FormError>
-            <FormSuccess message={success}></FormSuccess>
+            <FormError message={error ?? ""}></FormError>
+            <FormSuccess message={success ?? ""}></FormSuccess>
             <Button type="submit" className="w-full" disabled={isPending}>
               {isPending ? "signing up..." : "Create an account"}
             </Button>
-            {/* <Button
+            <Button
               variant="outline"
               className="w-full"
-              onClick={() => signUp("google")}
+              onClick={() => authenticateWithProvider("google")}
             >
               Sign up with Google
-            </Button> */}
+            </Button>
           </form>
         </Form>
         <div className="mt-4 text-center text-sm">

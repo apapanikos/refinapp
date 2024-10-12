@@ -10,8 +10,9 @@ import { verifyPassword } from "@/src/lib/auth/utils";
 import { ZodError } from "zod";
 import { SignInSchema } from "@/src/lib/zod/auth";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
+import { User } from "@/src/lib/definitions";
 
-async function getUser(email: string): Promise<any | undefined> {
+async function getUser(email: string): Promise<User | undefined> {
   try {
     const userArr = await db
       .select()
@@ -19,7 +20,7 @@ async function getUser(email: string): Promise<any | undefined> {
       .where(eq(users.email, email))
       .limit(1);
 
-    return userArr[0];
+    return userArr[0] as User;
   } catch (error) {
     console.error("Failed to fetch user:", error);
     return;
@@ -47,6 +48,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           response_type: "code",
         },
       },
+      allowDangerousEmailAccountLinking: true,
     }),
     CredentialsProvider({
       name: "Credentials",

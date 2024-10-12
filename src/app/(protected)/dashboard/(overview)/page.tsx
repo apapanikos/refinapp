@@ -1,6 +1,5 @@
-import { signOut, useSession } from "next-auth/react";
-import { Button } from "@/src/components/ui/button";
 import { auth } from "@/auth";
+import { SignOutButton } from "@/src/components/auth/SignOutButton";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -12,7 +11,7 @@ export default async function DashboardPage() {
   return (
     <div>
       <h2>Welcome, {session.user?.name}</h2>
-      {/* <Button onClick={async () => await signOut()}>Sign out</Button> */}
+      <SignOutButton />
     </div>
   );
 }

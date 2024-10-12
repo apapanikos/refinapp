@@ -27,3 +27,26 @@ export type FormState =
       message?: string;
     }
   | undefined;
+
+export type SignInPageErrorParam =
+  | "Signin"
+  | "OAuthSignin"
+  | "OAuthCallbackError"
+  | "OAuthCreateAccount"
+  | "EmailCreateAccount"
+  | "Callback"
+  | "OAuthAccountNotLinked"
+  | "EmailSignin"
+  | "CredentialsSignin"
+  | "SessionRequired";
+
+export type User = {
+  id: string;
+  name: string;
+  email: string;
+  emailVerified: Date | null;
+  password: string;
+  updatedAt: Date;
+  createdAt: Date;
+  image: string | null;
+};
