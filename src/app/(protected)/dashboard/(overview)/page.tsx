@@ -10,7 +10,7 @@ export default async function DashboardPage() {
 
   return (
     <div>
-      <h2>Welcome, {session.user?.name}</h2>
+      <h2>Welcome, {JSON.parse(JSON.stringify(session?.user))}</h2>
       <SignOutButton />
     </div>
   );

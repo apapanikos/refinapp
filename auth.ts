@@ -1,5 +1,5 @@
 // /* eslint-disable @typescript-eslint/no-explicit-any */
-import NextAuth from "next-auth";
+import NextAuth, { type DefaultSession } from "next-auth";
 import { authConfig } from "./auth.config";
 import CredentialsProvider from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
@@ -11,6 +11,14 @@ import { ZodError } from "zod";
 import { SignInSchema } from "@/src/lib/zod/auth";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { User } from "@/src/lib/definitions";
+
+declare module "@auth/core" {
+  interface Session {
+    user: {
+      roleId: number;
+    } & DefaultSession["user"];
+  }
+}
 
 async function getUser(email: string): Promise<User | null> {
   try {
@@ -76,7 +84,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             throw new Error("User not found.");
           }
 
+          if (!user.password) {
+            throw new Error(
+              "User does not have a password. Please sign in with your OAuth provider."
+            );
+          }
+
           const passwordsMatch = await verifyPassword(password, user.password);
+
           if (!passwordsMatch) {
             return null;
           }

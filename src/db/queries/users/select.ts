@@ -1,32 +1,15 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/src/db/drizzle";
 import { SelectUser, users } from "@/src/db/schemas/users";
+import { User } from "@/src/lib/definitions";
 
-export async function getAllUsers(): Promise<
-  Array<{
-    id: string;
-    name: string;
-    email: string;
-    emailVerified: Date | null;
-    password: string | null;
-    updatedAt: Date | null;
-    createdAt: Date | null;
-  }>
-> {
+export async function getAllUsers(): Promise<Array<User>> {
   return db.select().from(users);
 }
 
 export async function getUserByEmail(
   email: SelectUser["email"]
-): Promise<Array<{
-  id: string;
-  name: string;
-  email: string;
-  emailVerified: Date | null;
-  password: string | null;
-  updatedAt: Date | null;
-  createdAt: Date | null;
-}> | null> {
+): Promise<Array<User> | null> {
   try {
     const user = db.select().from(users).where(eq(users.email, email)).limit(1);
     return user;
@@ -35,15 +18,9 @@ export async function getUserByEmail(
   }
 }
 
-export async function getUserById(id: SelectUser["id"]): Promise<Array<{
-  id: string;
-  name: string;
-  email: string;
-  emailVerified: Date | null;
-  password: string | null;
-  updatedAt: Date | null;
-  createdAt: Date | null;
-}> | null> {
+export async function getUserById(
+  id: SelectUser["id"]
+): Promise<Array<User> | null> {
   try {
     const user = db.select().from(users).where(eq(users.id, id));
     return user;

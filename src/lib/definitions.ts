@@ -45,8 +45,9 @@ export type User = {
   name: string;
   email: string;
   emailVerified: Date | null;
-  password: string;
-  updatedAt: Date;
-  createdAt: Date;
+  password: string | null;
+  updatedAt: Date | null;
+  createdAt: Date | null;
   image: string | null;
+  roleId: number;
 };
