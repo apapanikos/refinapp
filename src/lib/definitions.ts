@@ -51,3 +51,9 @@ export type User = {
   image: string | null;
   roleId: number;
 };
+
+export enum UserPlan {
+  Free = "free",
+  Premium = "premium",
+  Enterprise = "enterprise",
+}

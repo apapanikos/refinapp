@@ -4,12 +4,7 @@ import { z } from "zod";
 
 export type RoleType = (typeof allowedRoles)[number];
 
-export const allowedRoles = [
-  "basic_user",
-  "premium_user",
-  "enterprise_user",
-  "admin",
-] as const;
+export const allowedRoles = ["user", "admin"] as const;
 export const roleSchema = z.enum(allowedRoles);
 
 export const roles = pgTable("roles", {
@@ -17,7 +12,7 @@ export const roles = pgTable("roles", {
   roleType: text("role_type")
     .notNull()
     .unique()
-    .default(sql`'basic_user'`),
+    .default(sql`'user'`),
 });
 
 export type InsertRole = typeof roles.$inferInsert;

@@ -28,6 +28,8 @@ export const userSchema = z.object({
   email: z.string().email(),
   name: z.string().min(1),
   password: z.string().min(6),
+  roleId: z.number().min(1),
+  planId: z.number().min(1),
 });
 
 export const usersRelations = relations(users, ({ one, many }) => ({

@@ -5,33 +5,25 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import { db } from "@/src/db/drizzle";
 import { accounts, users } from "@/src/db/schema";
-import { eq } from "drizzle-orm";
 import { verifyPassword } from "@/src/lib/auth/utils";
 import { ZodError } from "zod";
 import { SignInSchema } from "@/src/lib/zod/auth";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
-import { User } from "@/src/lib/definitions";
+import { getUserByEmail } from "./src/db/queries/users/select";
+import { getRoleById } from "./src/db/queries/roles/select";
+
+export type ExtendedUser = DefaultSession["user"] & {
+  role: "user" | "admin";
+  emailVerified: boolean;
+};
 
 declare module "@auth/core" {
   interface Session {
-    user: {
-      roleId: number;
-    } & DefaultSession["user"];
+    user: ExtendedUser;
   }
-}
 
-async function getUser(email: string): Promise<User | null> {
-  try {
-    const userArr = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, email))
-      .limit(1);
-
-    return userArr.length > 0 ? (userArr[0] as User) : null;
-  } catch (error) {
-    console.error("Failed to fetch user:", error);
-    return null;
+  interface SignIn {
+    user: ExtendedUser;
   }
 }
 
@@ -78,24 +70,34 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           const { email, password } = validatedFields.data;
 
-          const user = await getUser(email);
+          const user = await getUserByEmail(email);
 
-          if (!user) {
+          if (!user || user.length === 0) {
             throw new Error("User not found.");
           }
 
-          if (!user.password) {
+          if (!user[0].password) {
             throw new Error(
               "User does not have a password. Please sign in with your OAuth provider."
             );
           }
 
-          const passwordsMatch = await verifyPassword(password, user.password);
+          const passwordsMatch = await verifyPassword(
+            password,
+            user[0].password
+          );
 
           if (!passwordsMatch) {
             return null;
           }
-          return user;
+
+          const role = await getRoleById(user[0].roleId);
+          console.log("role", role);
+
+          return {
+            ...user[0],
+            role,
+          };
         } catch (error) {
           if (error instanceof ZodError) {
             return null;

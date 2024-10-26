@@ -8,7 +8,8 @@ import * as z from "zod";
 import { hashPassword } from "@/src/lib/auth/utils";
 import { getUserByEmail } from "@/src/db/queries/users/select";
 import { createUser } from "@/src/db/queries/users/insert";
-// import { revalidatePath, revalidateTag } from "next/cache";
+import { generateVerificationToken } from "@/src/lib/auth/tokens";
+import { sendVerificationEmail } from "@/src/lib/mail";
 
 export async function signup(values: z.infer<typeof SignUpSchema>) {
   const validatedFields = SignupFormSchema.safeParse(values);
@@ -31,7 +32,10 @@ export async function signup(values: z.infer<typeof SignUpSchema>) {
 
   await createUser({ name, email, password: hashedPassword });
 
-  return { success: "User created!" };
+  const verificationToken = await generateVerificationToken(email);
+  await sendVerificationEmail(verificationToken.email, verificationToken.token);
+
+  return { success: "Confirmation email sent!" };
 }
 
 export async function signin(values: z.infer<typeof SignInSchema>) {
@@ -42,6 +46,30 @@ export async function signin(values: z.infer<typeof SignInSchema>) {
       error: validatedFields.error.flatten().fieldErrors,
     };
   }
+
+  const existingUser = await getUserByEmail(values.email);
+
+  if (
+    !existingUser ||
+    existingUser.length === 0 ||
+    !existingUser[0]?.email ||
+    !existingUser[0]?.password
+  ) {
+    return { error: "Email does not exists!" };
+  }
+
+  if (!existingUser[0].emailVerified) {
+    const verificationToken = await generateVerificationToken(
+      existingUser[0]?.email
+    );
+    await sendVerificationEmail(
+      verificationToken.email,
+      verificationToken.token
+    );
+
+    return { success: "Confirmation email sent!" };
+  }
+
   try {
     await signIn("credentials", values);
   } catch (error) {

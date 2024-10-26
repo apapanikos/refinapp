@@ -5,3 +5,4 @@ export * from "@/src/db/schemas/categories";
 export * from "@/src/db/schemas/roles";
 export * from "@/src/db/schemas/accounts";
 export * from "@/src/db/schemas/plans";
+export * from "@/src/db/schemas/verificationTokens";

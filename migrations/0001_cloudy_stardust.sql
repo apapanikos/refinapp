@@ -1,0 +1,1 @@
+ALTER TABLE "roles" ALTER COLUMN "role_type" SET DEFAULT 'user';

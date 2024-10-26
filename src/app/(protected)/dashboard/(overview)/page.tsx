@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { SignOutButton } from "@/src/components/auth/SignOutButton";
+import { SignOutButton } from "@/src/components/auth/sign-out-button";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -10,7 +10,18 @@ export default async function DashboardPage() {
 
   return (
     <div>
-      <h2>Welcome, {JSON.parse(JSON.stringify(session?.user))}</h2>
+      <h2>
+        Welcome, {session?.user?.name}!
+        {session?.user && (
+          <ul>
+            {Object.entries(session.user).map(([key, value]) => (
+              <li key={key}>
+                <strong>{key}:</strong> {value ?? "N/A"}
+              </li>
+            ))}
+          </ul>
+        )}
+      </h2>
       <SignOutButton />
     </div>
   );

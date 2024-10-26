@@ -28,8 +28,15 @@ import {
 import { FormError } from "@/src/components/form-error";
 import { FormSuccess } from "@/src/components/form-success";
 import { useTransition } from "react";
+import { useSearchParams } from "next/navigation";
 
 export const SignInForm = () => {
+  const searchParams = useSearchParams();
+
+  const urlError =
+    searchParams.get("error") === "OAuthAccountNotLinked"
+      ? "Email is already in use. Please sign in with Google."
+      : "";
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
@@ -44,7 +51,9 @@ export const SignInForm = () => {
 
     startTransition(() => {
       signin(values).then((data) => {
-        setError(data.error as string);
+        if (typeof data?.error === "string") {
+          setError(data.error);
+        }
         setSuccess(data.success);
       });
     });
@@ -104,7 +113,7 @@ export const SignInForm = () => {
                 </FormItem>
               )}
             />
-            <FormError message={error ?? ""}></FormError>
+            <FormError message={error ?? urlError}></FormError>
             <FormSuccess message={success ?? ""}></FormSuccess>
             <Button type="submit" className="w-full" disabled={isPending}>
               {isPending ? "Signing in..." : "Sign In"}

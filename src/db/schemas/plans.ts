@@ -6,3 +6,6 @@ export const plans = pgTable("plans", {
   features: text("features"), // You can store the features in JSON or a separate table
   price: text("price"), // Store price details
 });
+
+export type InsertPlan = typeof plans.$inferInsert;
+export type SelectPlan = typeof plans.$inferSelect;

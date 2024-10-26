@@ -5,7 +5,7 @@ import { Button } from "@/src/components/ui/button"; // ShadCN Button component
 
 export const SignOutButton = () => {
   const handleSignOut = async () => {
-    await signOut({ callbackUrl: "/" }); // Redirect after sign out (optional)
+    await signOut();
   };
 
   return (

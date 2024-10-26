@@ -1,3 +1,5 @@
+import { getPlanIdByName } from "@/src/db/queries/plans/select";
+import { getRoleId } from "@/src/db/queries/roles/select";
 import bcrypt from "bcryptjs";
 
 export async function hashPassword(password: string) {
@@ -8,4 +10,11 @@ export async function hashPassword(password: string) {
 export async function verifyPassword(password: string, hashedPassword: string) {
   const isValid = await bcrypt.compare(password, hashedPassword);
   return isValid;
+}
+
+export async function getDefaultUserSettings() {
+  const defaultRoleId = await getRoleId("user"); // Default role "user"
+  const defaultPlanId = await getPlanIdByName("basic"); // Default plan "basic"
+
+  return { defaultRoleId, defaultPlanId };
 }

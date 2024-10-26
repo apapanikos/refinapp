@@ -1,8 +1,15 @@
 import { db } from "@/src/db/drizzle";
 import { InsertUser, users, userSchema } from "@/src/db/schemas/users";
+import { getDefaultUserSettings } from "@/src/lib/auth/utils";
 
 export async function createUser(data: InsertUser) {
-  // Validate the request body using Zod
-  const parsedData = userSchema.parse(data);
-  await db.insert(users).values(parsedData);
+  const { defaultRoleId, defaultPlanId } = await getDefaultUserSettings();
+
+  const parsedDataWithRoleAndPlan = userSchema.parse({
+    ...data,
+    roleId: defaultRoleId,
+    planId: defaultPlanId,
+  });
+
+  await db.insert(users).values(parsedDataWithRoleAndPlan);
 }
